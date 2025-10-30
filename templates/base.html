@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Metro FaceCheck</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+  <header>
+    <h1>Metro FaceCheck</h1>
+    {% if session.user %}
+      <div>Xin chào {{ session.user.username }} | <a href="/logout">Logout</a></div>
+    {% else %}
+      <div><a href="/login">Login</a> | <a href="/register">Register</a></div>
+    {% endif %}
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

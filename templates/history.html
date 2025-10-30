@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>History</h3>
+<table>
+  <tr><th>Trip Code</th><th>Type</th><th>Purchase</th><th>Valid From</th><th>Valid To</th><th>Used</th></tr>
+  {% for t in tickets %}
+  <tr>
+    <td>{{ t.trip_code }}</td>
+    <td>{{ t.ticket_type }}</td>
+    <td>{{ t.purchase_time }}</td>
+    <td>{{ t.valid_from }}</td>
+    <td>{{ t.valid_to }}</td>
+    <td>{{ t.used }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

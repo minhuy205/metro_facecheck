@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Station Check-in</h3>
+Station: <input id="station" value="Station A"><button id="start">Start</button>
+<video id="video" width="640" height="480" autoplay></video>
+<div id="status">Idle</div>
+<script src="/static/js/camera_checkin.js"></script>
+{% endblock %}

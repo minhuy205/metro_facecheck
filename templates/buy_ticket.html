@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Buy Ticket</h3>
+<form method="post">
+  <label><input type="radio" name="type" value="monthly" checked> Monthly</label>
+  <label><input type="radio" name="type" value="single"> Single</label>
+  <div id="monthly_fields">
+    <input type="date" name="valid_from"> to <input type="date" name="valid_to"><br>
+  </div>
+  <div id="single_fields" style="display:none;">
+    From: <input name="from_station"><br>
+    To: <input name="to_station"><br>
+  </div>
+  <button type="submit">Buy</button>
+</form>
+<script>
+const radios = document.querySelectorAll('input[name="type"]');
+radios.forEach(r=>r.addEventListener('change', ()=>{
+  if(document.querySelector('input[name="type"]:checked').value==='monthly'){
+    document.getElementById('monthly_fields').style.display='block';
+    document.getElementById('single_fields').style.display='none';
+  } else {
+    document.getElementById('monthly_fields').style.display='none';
+    document.getElementById('single_fields').style.display='block';
+  }
+}));
+</script>
+{% endblock %}

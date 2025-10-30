@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Admin</h3>
+<h4>Users</h4>
+<table>
+  <tr><th>ID</th><th>Username</th><th>Email</th><th>Phone</th><th>face_registered</th></tr>
+  {% for u in users %}
+  <tr><td>{{ u.id }}</td><td>{{ u.username }}</td><td>{{ u.email }}</td><td>{{ u.phone }}</td><td>{{ u.face_registered }}</td></tr>
+  {% endfor %}
+</table>
+<h4>Tickets</h4>
+<table>
+  <tr><th>ID</th><th>User</th><th>Type</th><th>Trip Code</th></tr>
+  {% for t in tickets %}
+  <tr><td>{{ t.id }}</td><td>{{ t.username }}</td><td>{{ t.ticket_type }}</td><td>{{ t.trip_code }}</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}
