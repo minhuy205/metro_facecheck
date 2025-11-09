@@ -1,8 +1,280 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
+
+{% block title %}Đăng Ký Khuôn Mặt - Metro FaceCheck{% endblock %}
+
+
 {% block content %}
-<h3>Upload Face</h3>
-<form method="post" enctype="multipart/form-data" action="/api/upload_face">
-  <input type="file" name="face" accept="image/*"><br>
-  <button type="submit">Upload</button>
-</form>
+<div class="page-container">
+    <div class="page-header">
+        <h2>Đăng Ký Khuôn Mặt</h2>
+        <p>Tải lên ảnh khuôn mặt để sử dụng kiểm soát nhân diện</p>
+    </div>
+
+
+    <div class="upload-container">
+        <div class="upload-form">
+            <!-- Progress Indicator -->
+            <div style="display: flex; justify-content: space-between; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid #f5f5f5;">
+                <div style="text-align: center; flex: 1;">
+                    <div style="width: 40px; height: 40px; background: #0066cc; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-weight: 600;">1</div>
+                    <p style="margin-top: 0.5rem; font-size: 0.9rem; font-weight: 600;">Tải Ảnh</p>
+                </div>
+                <div style="text-align: center; flex: 1;">
+                    <div style="width: 40px; height: 40px; background: #e6f0ff; color: #0066cc; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-weight: 600;">2</div>
+                    <p style="margin-top: 0.5rem; font-size: 0.9rem;">Xác Nhận</p>
+                </div>
+            </div>
+
+
+            <!-- Tab Navigation -->
+            <div class="upload-tabs">
+                <button type="button" class="upload-tab active" data-tab="upload">
+                    📤 Tải Ảnh
+                </button>
+                <button type="button" class="upload-tab" data-tab="camera">
+                    📷 Chụp Ảnh
+                </button>
+            </div>
+
+
+            <!-- Upload Tab -->
+            <div id="upload" class="upload-tab-content active">
+                <form id="upload-form" enctype="multipart/form-data">
+                    <div class="upload-area" id="upload-area">
+                        <div class="upload-icon">📁</div>
+                        <h3>Tải Ảnh Khuôn Mặt</h3>
+                        <p>Kéo ảnh vào đây hoặc bấm để chọn</p>
+                        <label for="face-input" class="upload-label">Chọn Ảnh</label>
+                        <input type="file" id="face-input" name="face" accept="image/*" required>
+                    </div>
+
+
+                    <div class="upload-preview" id="upload-preview" style="display: none;">
+                        <img id="preview-img" src="{{ url_for('static', filename='placeholder.svg') }}" alt="Preview">
+                        <p id="preview-text">Ảnh preview</p>
+                        <button type="button" class="btn btn-secondary" id="clear-btn">Chọn Ảnh Khác</button>
+                    </div>
+
+
+                    <button type="submit" class="btn btn-primary btn-lg btn-block" id="submit-btn" style="display: none;">
+                        Tải Lên Khuôn Mặt
+                    </button>
+                </form>
+            </div>
+
+
+            <!-- Camera Tab -->
+            <div id="camera" class="upload-tab-content">
+                <div class="camera-section">
+                    <h3>Chụp Ảnh Khuôn Mặt</h3>
+                    <div class="camera-container">
+                        <video id="camera-video" autoplay playsinline></video>
+                    </div>
+                    <div class="camera-controls">
+                        <button type="button" class="camera-btn camera-btn-start" id="start-camera-btn">
+                            Bật Camera
+                        </button>
+                        <button type="button" class="camera-btn camera-btn-capture" id="capture-btn" style="display: none;">
+                            Chụp Ảnh
+                        </button>
+                        <button type="button" class="camera-btn camera-btn-stop" id="stop-camera-btn" style="display: none;">
+                            Tắt Camera
+                        </button>
+                    </div>
+
+
+                    <div class="upload-preview" id="camera-preview" style="display: none;">
+                        <img id="camera-img" src="{{ url_for('static', filename='placeholder.svg') }}" alt="Captured">
+                        <p>Ảnh đã chụp</p>
+                        <button type="button" class="btn btn-secondary" id="recapture-btn">Chụp Lại</button>
+                    </div>
+
+
+                    <button type="button" class="btn btn-primary btn-lg btn-block" id="submit-camera-btn" style="display: none;">
+                        Tải Lên Khuôn Mặt
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- Requirements -->
+            <div style="margin-top: 2rem; padding: 1.5rem; background: #e6f9f5; border-radius: 0.75rem; border-left: 4px solid #00cc99;">
+                <h4 style="color: #009973; margin-bottom: 1rem;">Yêu Cầu Ảnh Khuôn Mặt</h4>
+                <ul style="list-style: none; padding: 0; color: #666;">
+                    <li style="margin-bottom: 0.5rem;;">✓ Ảnh rõ, sáng, không mờ</li>
+                    <li style="margin-bottom: 0.5rem;;">✓ Nhìn thẳng vào camera</li>
+                    <li style="margin-bottom: 0.5rem;;">✓ Không đeo kính, mũ, khăn che mặt</li>
+                    <li style="margin-bottom: 0.5rem;;">✓ Chỉ 1 khuôn mặt trong ảnh</li>
+                </ul>
+            </div>
+
+
+            <!-- Data Privacy Notice -->
+            <div style="margin-top: 1.5rem; padding: 1rem; background: #e6f0ff; border-radius: 0.75rem; border-left: 4px solid #0066cc;">
+                <p style="color: #0066cc; font-size: 0.9rem;">
+                    🔒 Dữ liệu khuôn mặt của bạn được mã hóa và bảo vệ hoàn toàn. Chúng tôi tuân thủ các quy định bảo vệ dữ liệu cá nhân cao nhất.
+                </p>
+            </div>
+
+
+            <!-- Skip Option -->
+            <a href="/" class="btn btn-secondary btn-lg btn-block" style="margin-top: 2rem;">
+                Làm Sau
+            </a>
+        </div>
+    </div>
+</div>
+
+
+<canvas id="canvas" style="display: none;"></canvas>
+
+
+<script>
+    // Upload Tab
+    const uploadArea = document.getElementById('upload-area');
+    const faceInput = document.getElementById('face-input');
+    const uploadPreview = document.getElementById('upload-preview');
+    const previewImg = document.getElementById('preview-img');
+    const submitBtn = document.getElementById('submit-btn');
+    const uploadForm = document.getElementById('upload-form');
+    const clearBtn = document.getElementById('clear-btn');
+
+
+    // Tab switching
+    document.querySelectorAll('.upload-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.upload-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.upload-tab-content').forEach(c => c.classList.remove('active'));
+           
+            this.classList.add('active');
+            const tabContent = document.getElementById(this.dataset.tab);
+            tabContent.classList.add('active');
+        });
+    });
+
+
+    // File input handling
+    faceInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                previewImg.src = event.target.result;
+                uploadPreview.style.display = 'flex';
+                uploadArea.style.display = 'none';
+                submitBtn.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+
+    clearBtn.addEventListener('click', function() {
+        faceInput.value = '';
+        uploadPreview.style.display = 'none';
+        uploadArea.style.display = 'block';
+        submitBtn.style.display = 'none';
+    });
+
+
+    uploadForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+       
+        try {
+            const response = await fetch('/api/upload_face', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+           
+            if (result.success) {
+                alert('Tải lên khuôn mặt thành công!');
+                window.location.href = '/';
+            } else {
+                alert('Lỗi: ' + result.error);
+            }
+        } catch (error) {
+            alert('Lỗi tải lên: ' + error.message);
+        }
+    });
+
+
+    // Camera Tab
+    const video = document.getElementById('camera-video');
+    const startBtn = document.getElementById('start-camera-btn');
+    const captureBtn = document.getElementById('capture-btn');
+    const stopBtn = document.getElementById('stop-camera-btn');
+    const cameraPreview = document.getElementById('camera-preview');
+    const cameraImg = document.getElementById('camera-img');
+    const submitCameraBtn = document.getElementById('submit-camera-btn');
+    const recaptureBtn = document.getElementById('recapture-btn');
+    const canvas = document.getElementById('canvas');
+
+
+    let mediaStream = null;
+
+
+    startBtn.addEventListener('click', async function() {
+        try {
+            mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = mediaStream;
+            startBtn.style.display = 'none';
+            captureBtn.style.display = 'inline-block';
+            stopBtn.style.display = 'inline-block';
+        } catch (error) {
+            alert('Lỗi truy cập camera: ' + error.message);
+        }
+    });
+
+
+    captureBtn.addEventListener('click', function() {
+        const context = canvas.getContext('2d');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0);
+        cameraImg.src = canvas.toDataURL('image/jpeg');
+        cameraPreview.style.display = 'flex';
+        submitCameraBtn.style.display = 'block';
+    });
+
+
+    stopBtn.addEventListener('click', function() {
+        mediaStream.getTracks().forEach(track => track.stop());
+        video.srcObject = null;
+        startBtn.style.display = 'inline-block';
+        captureBtn.style.display = 'none';
+        stopBtn.style.display = 'none';
+    });
+
+
+    recaptureBtn.addEventListener('click', function() {
+        cameraPreview.style.display = 'none';
+        submitCameraBtn.style.display = 'none';
+    });
+
+
+    submitCameraBtn.addEventListener('click', async function() {
+        const formData = new FormData();
+        canvas.toBlob(function(blob) {
+            formData.append('face', blob, 'captured.jpg');
+           
+            fetch('/api/upload_face', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    alert('Tải lên khuôn mặt thành công!');
+                    window.location.href = '/';
+                } else {
+                    alert('Lỗi: ' + result.error);
+                }
+            })
+            .catch(error => alert('Lỗi tải lên: ' + error.message));
+        });
+    });
+</script>
 {% endblock %}

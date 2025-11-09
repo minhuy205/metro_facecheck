@@ -1,5 +1,188 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
+
+{% block title %}Trang Chủ - Metro FaceCheck{% endblock %}
+
+
 {% block content %}
-<h2>Welcome to Metro Face-Check</h2>
-<p><a href="/buy_ticket">Buy Ticket</a> | <a href="/history">History</a> | <a href="/upload_face">Upload Face</a> | <a href="/checkin">Station Check-in</a></p>
+<div class="page-container">
+    {% if not session.get('user') %}
+        <!-- Unauthenticated Homepage -->
+       
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">Kiểm Soát Khuôn Mặt Thông Minh</h1>
+                <p class="hero-subtitle">Công nghệ nhân diện nhanh chóng, an toàn, tiện lợi</p>
+                <p class="hero-description">
+                    Metro FaceCheck sử dụng công nghệ nhân diện khuôn mặt hàng đầu để kiểm soát vé metro của bạn.
+                    Vào và ra ga một cách nhanh chóng chỉ bằng nét mặt của bạn.
+                </p>
+                <div class="hero-actions">
+                    <a href="/register" class="btn btn-primary btn-lg">Bắt Đầu</a>
+                    <a href="#features" class="btn btn-secondary btn-lg">Tìm Hiểu Thêm</a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-icon">🔐</div>
+            </div>
+        </section>
+
+
+        <!-- Add public check-in button before features section -->
+        <section style="text-align: center; padding: 2rem 1rem; background: linear-gradient(135deg, #fff4e6 0%, #ffe6e6 100%); border-radius: 1rem; margin: 3rem 0;">
+            <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem;">Kiểm Soát Vào Ga</h2>
+            <p style="font-size: 1rem; color: #666; margin-bottom: 1.5rem;">Bạn đã có vé? Nhấp vào nút dưới để kiểm soát khuôn mặt vào ga.</p>
+            <a href="/checkin" class="btn btn-primary btn-lg">Kiểm Soát Vào Ga Ngay</a>
+        </section>
+
+
+        <!-- Features Section -->
+        <section class="features" id="features">
+            <h2>Tính Năng Nổi Bật</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Cực Kỳ Nhanh Chóng</h3>
+                    <p>Kiểm soát trong vòng 1 giây. Không cần tìm vé, không cần quẹt thẻ.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔐</div>
+                    <h3>Bảo Mật Cao</h3>
+                    <p>Công nghệ mã hóa tiên tiến bảo vệ dữ liệu khuôn mặt của bạn 24/7.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>Dễ Dàng Sử Dụng</h3>
+                    <p>Giao diện thân thiện, chỉ cần đăng ký một lần và bắt đầu sử dụng.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎟️</div>
+                    <h3>Vé Tháng Tiện Lợi</h3>
+                    <p>Vé tháng 30 ngày sử dụng không giới hạn với giá 500.000 VNĐ.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">✅</div>
+                    <h3>Độ Chính Xác Cao</h3>
+                    <p>Nhân diện chính xác 99.9%, hoạt động tốt trong mọi điều kiện.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3>Toàn Bộ Mạng Lưới</h3>
+                    <p>Sử dụng trên toàn bộ 6 ga metro với cơ sở hạ tầng hoàn chỉnh.</p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Steps Section -->
+        <section class="info-section">
+            <div class="info-box">
+                <h3>Cách Sử Dụng Cực Kỳ Đơn Giản - 3 Bước</h3>
+                <ol class="steps">
+                    <li><strong>Đăng Ký & Mua Vé:</strong> Đăng ký tài khoản, chọn vé tháng và thanh toán</li>
+                    <li><strong>Đăng Ký Khuôn Mặt:</strong> Tải lên hoặc chụp ảnh khuôn mặt của bạn</li>
+                    <li><strong>Kiểm Soát Vào:</strong> Đặt khuôn mặt vào camera tại ga, cổng tự động mở!</li>
+                </ol>
+            </div>
+        </section>
+
+
+        <!-- Stats Section -->
+        <section class="info-section">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 2rem; text-align: center;">
+                <div>
+                    <div style="font-size: 2.5rem; font-weight: 700; color: #0066cc;">100K+</div>
+                    <p style="color: #666; margin-top: 0.5rem;">Người Dùng Hàng Ngày</p>
+                </div>
+                <div>
+                    <div style="font-size: 2.5rem; font-weight: 700; color: #0066cc;">1M+</div>
+                    <p style="color: #666; margin-top: 0.5rem;">Lượt Kiểm Soát</p>
+                </div>
+                <div>
+                    <div style="font-size: 2.5rem; font-weight: 700; color: #0066cc;">6</div>
+                    <p style="color: #666; margin-top: 0.5rem;">Ga Metro</p>
+                </div>
+                <div>
+                    <div style="font-size: 2.5rem; font-weight: 700; color: #0066cc;">99.9%</div>
+                    <p style="color: #666; margin-top: 0.5rem;">Độ Chính Xác</p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- CTA Section -->
+        <section class="contact-section">
+            <div class="contact-content">
+                <h2>Bắt đầu ngay hôm nay</h2>
+                <p>Đăng ký tài khoản và trải nghiệm tương lai của giao thông công cộng. Chỉ mất 2 phút để thiết lập.</p>
+                <form action="/register" method="GET" class="contact-form">
+                    <input type="email" name="email" placeholder="Nhập email của bạn..." required>
+                    <button type="submit" class="btn">Đăng ký</button>
+                </form>
+            </div>
+        </section>
+
+
+    {% else %}
+        <!-- Authenticated Homepage -->
+        <div class="page-header">
+            <h2>Chào mừng, {{ session['user']['username'] }}</h2>
+            <p>Quản lý vé metro của bạn</p>
+        </div>
+
+
+        <!-- Quick Actions -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+            <a href="/buy_ticket" class="feature-card" style="text-decoration: none; cursor: pointer;">
+                <div class="feature-icon">🎟️</div>
+                <h3>Mua Vé Tháng</h3>
+                <p>Mua vé tháng 30 ngày sử dụng không giới hạn.</p>
+            </a>
+            <a href="/upload_face" class="feature-card" style="text-decoration: none; cursor: pointer;">
+                <div class="feature-icon">📸</div>
+                <h3>Đăng Ký Khuôn Mặt</h3>
+                <p>Tải lên hoặc chụp ảnh khuôn mặt của bạn để kiểm soát.</p>
+            </a>
+            <!-- Remove check-in from authenticated dashboard (moved to public) -->
+            <a href="/history" class="feature-card" style="text-decoration: none; cursor: pointer;">
+                <div class="feature-icon">📋</div>
+                <h3>Lịch Sử Vé</h3>
+                <p>Xem danh sách tất cả các vé đã mua.</p>
+            </a>
+        </div>
+
+
+        <!-- User Info -->
+        <section class="info-section" style="margin-top: 2rem;">
+            <div style="background: var(--white); border: 1px solid var(--gray-light); border-radius: 0.75rem; padding: 1.5rem;">
+                <h3 style="margin-bottom: 1rem;">Thông Tin Tài Khoản</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <p style="color: #666; font-size: 0.9rem;">Tên đăng nhập</p>
+                        <p style="font-weight: 600;">{{ session['user']['username'] }}</p>
+                    </div>
+                    <div>
+                        <p style="color: #666; font-size: 0.9rem;">Email</p>
+                        <p style="font-weight: 600;">{{ session['user']['email'] }}</p>
+                    </div>
+                    <div>
+                        <p style="color: #666; font-size: 0.9rem;">Số điện thoại</p>
+                        <p style="font-weight: 600;">{{ session['user']['phone'] }}</p>
+                    </div>
+                    <div>
+                        <p style="color: #666; font-size: 0.9rem;">Vai trò</p>
+                        <p style="font-weight: 600;">
+                            {% if session['user']['role'] == 'admin' %}
+                                <span class="badge badge-primary">Quản Trị Viên</span>
+                            {% else %}
+                                <span class="badge badge-secondary">Người Dùng</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+</div>
 {% endblock %}

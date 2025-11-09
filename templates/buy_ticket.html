@@ -1,28 +1,129 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
+
+{% block title %}Mua Vé - Metro FaceCheck{% endblock %}
+
+
 {% block content %}
-<h3>Buy Ticket</h3>
-<form method="post">
-  <label><input type="radio" name="type" value="monthly" checked> Monthly</label>
-  <label><input type="radio" name="type" value="single"> Single</label>
-  <div id="monthly_fields">
-    <input type="date" name="valid_from"> to <input type="date" name="valid_to"><br>
-  </div>
-  <div id="single_fields" style="display:none;">
-    From: <input name="from_station"><br>
-    To: <input name="to_station"><br>
-  </div>
-  <button type="submit">Buy</button>
-</form>
-<script>
-const radios = document.querySelectorAll('input[name="type"]');
-radios.forEach(r=>r.addEventListener('change', ()=>{
-  if(document.querySelector('input[name="type"]:checked').value==='monthly'){
-    document.getElementById('monthly_fields').style.display='block';
-    document.getElementById('single_fields').style.display='none';
-  } else {
-    document.getElementById('monthly_fields').style.display='none';
-    document.getElementById('single_fields').style.display='block';
-  }
-}));
-</script>
+<div class="page-container">
+    <div class="page-header">
+        <h2>Mua Vé Metro</h2>
+        <p>Chọn gói vé tháng của bạn</p>
+    </div>
+
+
+    {% if error %}
+                <div class="alert alert-error" style="margin-bottom: 1.5rem;">
+                    {{ error }}
+                </div>
+            {% endif %}
+
+
+            {% if has_active and not has_face %}
+                <div class="alert alert-info" style="margin-bottom: 1.5rem;">
+                    Bạn đã có vé tháng nhưng chưa đăng ký khuôn mặt. Vui lòng đăng ký khuôn mặt để kích hoạt vé.
+                </div>
+                <a href="{{ url_for('upload_face_page') }}" class="btn btn-primary btn-lg btn-block" style="margin-bottom:1rem;">Đăng Ký Khuôn Mặt</a>
+            {% endif %}
+
+
+    <div class="ticket-form-container">
+        <div class="ticket-form">
+            <form method="POST">
+                <!-- Simplified form - only monthly tickets with station selection -->
+               
+                <!-- Monthly Ticket Info -->
+                <div class="ticket-type-section">
+                    <h3>Vé Tháng - 3 Bước Đơn Giản</h3>
+                    <div style="background: #f5f5f5; padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 1.5rem;">
+                        <h4 style="color: #0066cc; margin-top: 0;">Vé Tháng 30 Ngày</h4>
+                        <p style="color: #666; font-size: 0.95rem; line-height: 1.6;">
+                            ✓ Sử dụng không giới hạn trong 30 ngày<br>
+                            ✓ Hỗ trợ đi qua tất cả 6 ga metro<br>
+                            ✓ Chỉ cần đăng ký khuôn mặt một lần<br>
+                            ✓ Giá: <strong>500.000 VNĐ</strong>
+                        </p>
+                    </div>
+                </div>
+
+
+                <!-- Step 1: Ticket Purchase -->
+                <div class="form-section">
+                    <h3>Bước 1: Chọn Vé</h3>
+                    <p style="color: #666; margin-bottom: 1rem;">Bạn đang chọn vé tháng 30 ngày với giá 500.000 VNĐ</p>
+                    <input type="hidden" name="ticket_type" value="monthly">
+                </div>
+
+
+                <!-- Step 2: Select Station -->
+                <div class="form-section">
+                    <h3>Bước 2: Chọn Ga Đi và Đến</h3>
+                   
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="from_station">Ga Đi (nơi bạn thường vào)</label>
+                            <!-- Changed name from station_from to station_from_id to match Flask app.py -->
+                            <select id="from_station" name="station_from_id" required>
+                                <option value="">-- Chọn ga đi --</option>
+                                {% for station in stations %}
+                                    <option value="{{ station.station_id }}">{{ station.station_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="to_station">Ga Đến (nơi bạn thường đi đến)</label>
+                            <!-- Changed name from station_to to station_to_id to match Flask app.py -->
+                            <select id="to_station" name="station_to_id" required>
+                                <option value="">-- Chọn ga đến --</option>
+                                {% for station in stations %}
+                                    <option value="{{ station.station_id }}">{{ station.station_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Step 3: Confirm Purchase -->
+                <div class="form-section">
+                    <h3>Bước 3: Xác Nhận Mua Vé</h3>
+                    <p style="color: #666; margin-bottom: 1rem;">Nhấp vào nút dưới để tiếp tục. Bạn sẽ được yêu cầu đăng ký khuôn mặt.</p>
+                </div>
+
+
+                <!-- Submit -->
+                <button type="submit" class="btn btn-primary btn-lg btn-block" style="margin-top: 2rem;">
+                    Tiếp Tục Bước Đăng Ký Khuôn Mặt
+                </button>
+
+
+                <a href="/" class="btn btn-secondary btn-lg btn-block" style="margin-top: 1rem;">
+                    Hủy
+                </a>
+            </form>
+
+
+            <!-- FAQ -->
+            <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #f5f5f5;">
+                <h3 style="margin-bottom: 1rem;">Câu Hỏi Thường Gặp</h3>
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div>
+                        <p style="font-weight: 600; color: #0066cc; margin-bottom: 0.5rem;">Vé tháng có thể sử dụng lại không?</p>
+                        <p style="color: #666; font-size: 0.9rem;">Có, vé tháng có thể sử dụng liên tục trong 30 ngày từ ngày mua.</p>
+                    </div>
+                    <div>
+                        <p style="font-weight: 600; color: #0066cc; margin-bottom: 0.5rem;">Cách chọn ga đi và đến?</p>
+                        <p style="color: #666; font-size: 0.9rem;">Chọn ga nơi bạn thường bắt đầu hành trình và ga nơi bạn thường đi đến. Vé tháng cho phép đi qua toàn bộ mạng lưới.</p>
+                    </div>
+                    <div>
+                        <p style="font-weight: 600; color: #0066cc; margin-bottom: 0.5rem;">Tôi có thể hủy vé không?</p>
+                        <p style="color: #666; font-size: 0.9rem;">Bạn có thể hủy vé trước khi sử dụng lần đầu tiên. Liên hệ hỗ trợ để được hoàn tiền.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -1,17 +1,71 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
+
+{% block title %}Lịch Sử Vé - Metro FaceCheck{% endblock %}
+
+
 {% block content %}
-<h3>History</h3>
-<table>
-  <tr><th>Trip Code</th><th>Type</th><th>Purchase</th><th>Valid From</th><th>Valid To</th><th>Used</th></tr>
-  {% for t in tickets %}
-  <tr>
-    <td>{{ t.trip_code }}</td>
-    <td>{{ t.ticket_type }}</td>
-    <td>{{ t.purchase_time }}</td>
-    <td>{{ t.valid_from }}</td>
-    <td>{{ t.valid_to }}</td>
-    <td>{{ t.used }}</td>
-  </tr>
-  {% endfor %}
-</table>
+<div class="page-container">
+    <div class="page-header">
+        <h2>Lịch Sử Vé Của Bạn</h2>
+        <p>Xem tất cả các vé đã mua</p>
+    </div>
+
+
+    {% if tickets %}
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Loại Vé</th>
+                        <th>Chi Tiết</th>
+                        <th>Hiệu Lực</th>
+                        <th>Trạng Thái</th>
+                        <th>Ngày Mua</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in tickets %}
+                        <tr>
+                            <td>
+                                <!-- All tickets are now monthly only -->
+                                <span class="badge badge-primary">Vé Tháng</span>
+                            </td>
+                            <td>
+                                <!-- Changed column names from old schema to new: station_from to station_from, station_to to station_to -->
+                                {{ ticket.station_from or '-' }} → {{ ticket.station_to or '-' }}
+                            </td>
+                            <td>
+                                <!-- Changed from valid_from/valid_to to valid_at_datetime, using simple date formatting -->
+                                {% if ticket.valid_at_datetime %}
+                                    {{ ticket.valid_at_datetime.strftime('%d/%m/%Y') }} (30 ngày)
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if ticket.status == 'NEW' %}
+                                    <span class="badge badge-primary">Mới</span>
+                                {% elif ticket.status == 'USED' %}
+                                    <span class="badge badge-success">Đã Dùng</span>
+                                {% else %}
+                                    <span class="badge badge-warning">Hết Hạn</span>
+                                {% endif %}
+                            </td>
+                            <!-- Changed from purchase_time to created_at column -->
+                            <td>{{ ticket.created_at.strftime('%d/%m/%Y %H:%M') if ticket.created_at else '-' }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">📝</div>
+            <h3>Chưa Có Vé Nào</h3>
+            <p>Hãy mua vé đầu tiên của bạn để bắt đầu sử dụng dịch vụ.</p>
+            <a href="/buy_ticket" class="btn btn-primary btn-lg">Mua Vé Ngay</a>
+        </div>
+    {% endif %}
+</div>
 {% endblock %}
