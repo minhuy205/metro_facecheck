@@ -17,8 +17,12 @@
             <table class="data-table">
                 <thead>
                     <tr>
+                        <!-- ✨ SỬA LỖI: Cột 1 là ID (từ CSDL) -->
+                        <th>ID Vé</th>
                         <th>Loại Vé</th>
-                        <th>Chi Tiết</th>
+                        <!-- ✨ THÊM CỘT MÃ VÉ ✨ -->
+                        <th>Mã Vé (Trip Code)</th>
+                        <th>Chi Tiết (Từ → Đến)</th>
                         <th>Hiệu Lực</th>
                         <th>Trạng Thái</th>
                         <th>Ngày Mua</th>
@@ -27,33 +31,43 @@
                 <tbody>
                     {% for ticket in tickets %}
                         <tr>
+                            <!-- ✨ SỬA LỖI: Dùng ticket.id -->
+                            <td>{{ ticket.id }}</td>
                             <td>
-                                <!-- All tickets are now monthly only -->
-                                <span class="badge badge-primary">Vé Tháng</span>
+                                {% if ticket.ticket_type == 'monthly' %}
+                                    <span class="badge badge-primary">Vé Tháng</span>
+                                {% else %}
+                                    <span class="badge badge-secondary">Vé Lượt</span>
+                                {% endif %}
                             </td>
                             <td>
-                                <!-- Changed column names from old schema to new: station_from to station_from, station_to to station_to -->
-                                {{ ticket.station_from or '-' }} → {{ ticket.station_to or '-' }}
+                                <!-- ✨ THÊM: Hiển thị trip_code (từ app.py) ✨ -->
+                                <code>{{ ticket.trip_code or 'N/A' }}</code>
                             </td>
                             <td>
-                                <!-- Changed from valid_from/valid_to to valid_at_datetime, using simple date formatting -->
-                                {% if ticket.valid_at_datetime %}
-                                    {{ ticket.valid_at_datetime.strftime('%d/%m/%Y') }} (30 ngày)
+                                <!-- ✨ SỬA LỖI: Dùng ticket.from_station_name -->
+                                {{ ticket.from_station_name or '-' }} → {{ ticket.to_station_name or '-' }}
+                            </td>
+                            <td>
+                                <!-- ✨ SỬA LỖI: Dùng ticket.valid_from -->
+                                {% if ticket.valid_from %}
+                                    {{ ticket.valid_from.strftime('%d/%m/%Y') }} (30 ngày)
                                 {% else %}
                                     -
                                 {% endif %}
                             </td>
                             <td>
-                                {% if ticket.status == 'NEW' %}
+                                <!-- ✨ SỬA LỖI: Kiểm tra cả 'used' -->
+                                {% if ticket.status == 'NEW' and ticket.used == 0 %}
                                     <span class="badge badge-primary">Mới</span>
-                                {% elif ticket.status == 'USED' %}
+                                {% elif ticket.status == 'USED' or ticket.used == 1 %}
                                     <span class="badge badge-success">Đã Dùng</span>
                                 {% else %}
-                                    <span class="badge badge-warning">Hết Hạn</span>
+                                    <span class="badge badge-warning">{{ ticket.status or 'Hết hạn' }}</span>
                                 {% endif %}
                             </td>
-                            <!-- Changed from purchase_time to created_at column -->
-                            <td>{{ ticket.created_at.strftime('%d/%m/%Y %H:%M') if ticket.created_at else '-' }}</td>
+                            <!-- ✨ SỬA LỖI: Dùng ticket.purchase_time (từ CSDL) -->
+                            <td>{{ ticket.purchase_time.strftime('%d/%m/%Y %H:%M') if ticket.purchase_time else '-' }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -69,3 +83,7 @@
     {% endif %}
 </div>
 {% endblock %}
+
+
+
+

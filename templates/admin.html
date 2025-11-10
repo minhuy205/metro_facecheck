@@ -262,12 +262,12 @@
 <div class="admin-container">
     <div class="admin-header">
         <h1 style="font-size: 2rem; margin: 0;">Bảng Điều Khiển Admin</h1>
-        <a href="/logout" class="btn btn-secondary">Đăng Xuất</a>
     </div>
 
 
     <!-- Statistics -->
     <div class="stats-grid">
+        <!-- (Các thẻ stat-card giữ nguyên) -->
         <div class="stat-card">
             <div class="stat-value">{{ total_users }}</div>
             <div class="stat-label">Tổng Người Dùng</div>
@@ -292,6 +292,8 @@
         <button class="tab-btn active" data-tab="users">Quản Lý Người Dùng</button>
         <button class="tab-btn" data-tab="tickets">Quản Lý Vé</button>
         <button class="tab-btn" data-tab="entry_logs">Lịch Sử Kiểm Soát</button>
+        <!-- ✨ YÊU CẦU MỚI: Thêm Tab Quản Lý Ga ✨ -->
+        <button class="tab-btn" data-tab="stations">Quản Lý Ga</button>
     </div>
 
 
@@ -317,24 +319,30 @@
                             <th>Tên Đăng Nhập</th>
                             <th>Email</th>
                             <th>Số Điện Thoại</th>
-                            <th>Ngày Tạo</th>
+                            <th>Đã ĐK Khuôn Mặt</th>
                             <th>Hành Động</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for user in users %}
                             <tr>
-                                <td>{{ user.user_id }}</td>
+                                <td>{{ user.id }}</td>
                                 <td><strong>{{ user.username }}</strong></td>
                                 <td>{{ user.email }}</td>
                                 <td>{{ user.phone }}</td>
-                                <td>{{ user.created_at.strftime('%d/%m/%Y') if user.created_at else '-' }}</td>
                                 <td>
-                                    <!-- Add edit and delete buttons for users -->
-                                    <button class="action-btn edit" onclick="editUser({{ user.user_id }}, '{{ user.username }}', '{{ user.email }}', '{{ user.phone }}')">Sửa</button>
+                                    {% if user.face_registered == 1 %}
+                                        <span class="badge badge-success">Đã Đăng Ký</span>
+                                    {% else %}
+                                        <span class="badge badge-secondary">Chưa</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <!-- ✨ SỬA LỖI JS: Đổi ngoặc kép (") thành ngoặc đơn (') -->
+                                    <button class='action-btn edit' onclick='editUser({{ user.id }}, {{ user.username|tojson }}, {{ user.email|tojson }}, {{ user.phone|tojson }})'>Sửa</button>
                                     <button
                                         class="action-btn"
-                                        onclick="deleteUser({{ user.user_id }}, '{{ user.username }}')"
+                                        onclick='deleteUser({{ user.id }}, {{ user.username|tojson }})'
                                     >
                                         Xóa
                                     </button>
@@ -370,12 +378,12 @@
                 <table class="data-table" id="tickets-table">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>ID Vé</th>
                             <th>Người Dùng</th>
+                            <th>Mã Vé (Trip Code)</th>
                             <th>Từ - Đến</th>
                             <th>Hiệu Lực</th>
                             <th>Trạng Thái</th>
-                            <th>Giá</th>
                             <th>Ngày Mua</th>
                             <th>Hành Động</th>
                         </tr>
@@ -383,34 +391,36 @@
                     <tbody>
                         {% for ticket in tickets %}
                             <tr>
-                                <td>{{ ticket.ticket_id }}</td>
+                                <td>{{ ticket.id }}</td>
                                 <td>{{ ticket.username or '-' }}</td>
                                 <td>
-                                    {{ ticket.from_station_name or '-' }} → {{ ticket.to_station_name or '-' }}
+                                    <code>{{ ticket.trip_code or 'N/A' }}</code>
                                 </td>
                                 <td>
-                                    {% if ticket.valid_at_datetime %}
-                                        30 ngày từ {{ ticket.valid_at_datetime.strftime('%d/%m') }}
+                                    {{ ticket.from_station_name or ticket.single_from_station or '-' }} → {{ ticket.to_station_name or ticket.single_to_station or '-' }}
+                                </td>
+                                <td>
+                                    {% if ticket.ticket_type == 'monthly' and ticket.valid_from %}
+                                        30 ngày từ {{ ticket.valid_from.strftime('%d/%m') }}
                                     {% else %}
                                         -
                                     {% endif %}
                                 </td>
                                 <td>
-                                    {% if ticket.status == 'NEW' %}
+                                    {% if ticket.status == 'NEW' and ticket.used == 0 %}
                                         <span class="badge badge-primary">Mới</span>
-                                    {% elif ticket.status == 'USED' %}
+                                    {% elif ticket.status == 'USED' or ticket.used == 1 %}
                                         <span class="badge badge-success">Đã Dùng</span>
                                     {% else %}
-                                        <span class="badge badge-warning">Hết Hạn</span>
+                                        <span class="badge badge-warning">{{ ticket.status or 'Không rõ' }}</span>
                                     {% endif %}
                                 </td>
-                                <td>{{ ticket.purchase_price or 0 | string }}đ</td>
-                                <td>{{ ticket.created_at.strftime('%d/%m/%Y') if ticket.created_at else '-' }}</td>
+                                <td>{{ ticket.purchase_time.strftime('%d/%m/%Y') if ticket.purchase_time else '-' }}</td>
                                 <td>
-                                    <!-- Add delete button for tickets -->
+                                    <!-- ✨ SỬA LỖI JS: Đổi ngoặc kép (") thành ngoặc đơn (') -->
                                     <button
                                         class="action-btn"
-                                        onclick="deleteTicket({{ ticket.ticket_id }})"
+                                        onclick='deleteTicket({{ ticket.id }})'
                                     >
                                         Xóa
                                     </button>
@@ -446,11 +456,10 @@
                 <table class="data-table" id="entry-logs-table">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>ID Log</th>
                             <th>Người Dùng</th>
-                            <th>Ga</th>
+                            <th>Ga Checkin</th>
                             <th>Thời Gian</th>
-                            <th>Hành Động</th>
                             <th>Kết Quả</th>
                         </tr>
                     </thead>
@@ -458,18 +467,11 @@
                         {% for log in entry_logs %}
                             <tr>
                                 <td>{{ log.log_id }}</td>
-                                <td>{{ log.username or '-' }}</td>
-                                <td>{{ log.station_name or '-' }}</td>
+                                <td>{{ log.username or 'N/A' }}</td>
+                                <td>{{ log.station_name or 'N/A' }}</td>
                                 <td>{{ log.timestamp.strftime('%d/%m/%Y %H:%M:%S') if log.timestamp else '-' }}</td>
                                 <td>
-                                    {% if log.action == 'tap_in' %}
-                                        <span class="badge badge-primary">Vào</span>
-                                    {% else %}
-                                        <span class="badge badge-secondary">Ra</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if log.action == 'tap_in' %}
+                                    {% if log.success == 1 %}
                                         <span class="badge badge-success">Thành Công</span>
                                     {% else %}
                                         <span class="badge badge-warning">Thất Bại</span>
@@ -486,10 +488,54 @@
             </div>
         {% endif %}
     </div>
+   
+    <!-- ✨ YÊU CẦU MỚI: Thêm Tab Quản Lý Ga ✨ -->
+    <div id="stations" class="tab-content">
+        <div class="table-controls">
+            <input
+                type="text"
+                class="search-box"
+                placeholder="Tìm kiếm theo tên ga..."
+                id="station-search"
+            >
+            <button class="btn btn-primary" onclick="exportStationData()">Xuất Dữ Liệu</button>
+        </div>
+
+
+        {% if station_stats %}
+            <div class="table-container">
+                <table class="data-table" id="stations-table">
+                    <thead>
+                        <tr>
+                            <th>Tên Ga</th>
+                            <th>Tổng Lượt Check-in</th>
+                            <th>Check-in Thành Công</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for station in station_stats %}
+                            <tr>
+                                <td><strong>{{ station.station_name }}</strong></td>
+                                <td>{{ station.total_checkins }}</td>
+                                <td>{{ station.successful_checkins }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-message">
+                <p>Chưa có dữ liệu thống kê ga.</p>
+            </div>
+        {% endif %}
+    </div>
+    <!-- ✨ --- Hết tab mới --- ✨ -->
+
+
 </div>
 
 
-<!-- Add edit user modal -->
+<!-- Add edit user modal (Không đổi) -->
 <div id="editUserModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -519,7 +565,7 @@
 
 
 <script>
-    // Tab switching
+    // Tab switching (Không đổi)
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -531,7 +577,7 @@
     });
 
 
-    // Edit user modal
+    // Edit user modal (Không đổi)
     function editUser(userId, username, email, phone) {
         document.getElementById('editUserId').value = userId;
         document.getElementById('editUsername').value = username;
@@ -577,7 +623,7 @@
     });
 
 
-    // Delete user
+    // Delete user (Không đổi)
     async function deleteUser(userId, username) {
         if (!confirm(`Bạn chắc chắn muốn xóa người dùng "${username}"?`)) return;
        
@@ -599,7 +645,7 @@
     }
 
 
-    // Delete ticket
+    // Delete ticket (Không đổi)
     async function deleteTicket(ticketId) {
         if (!confirm('Bạn chắc chắn muốn xóa vé này?')) return;
        
@@ -621,7 +667,7 @@
     }
 
 
-    // Search functions
+    // Search functions (Thêm search cho tab Ga)
     document.getElementById('user-search').addEventListener('keyup', function(e) {
         const query = e.target.value.toLowerCase();
         document.querySelectorAll('#users-table tbody tr').forEach(row => {
@@ -649,6 +695,16 @@
     });
 
 
+    // ✨ YÊU CẦU MỚI: Thêm JS cho tab Ga ✨
+    document.getElementById('station-search').addEventListener('keyup', function(e) {
+        const query = e.target.value.toLowerCase();
+        document.querySelectorAll('#stations-table tbody tr').forEach(row => {
+            const stationName = row.cells[0].textContent.toLowerCase();
+            row.style.display = stationName.includes(query) ? '' : 'none';
+        });
+    });
+
+
     // Export functions
     function exportUserData() {
         const table = document.getElementById('users-table');
@@ -668,6 +724,13 @@
     }
 
 
+    // ✨ YÊU CẦU MỚI: Thêm JS cho tab Ga ✨
+    function exportStationData() {
+        const table = document.getElementById('stations-table');
+        exportTableToCSV('station_stats.csv', table);
+    }
+
+
     function exportTableToCSV(filename, table) {
         let csv = [];
         let rows = table.querySelectorAll('tr');
@@ -676,14 +739,24 @@
             let row = [];
             let cols = rows[i].querySelectorAll('td, th');
            
-            for (let j = 0; j < cols.length; j++) {
-                row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
+            let colCount = cols.length;
+            // Bảng 'entry-logs-table' và 'stations-table' không có cột Hành Động
+            if (table.id !== 'entry-logs-table' && table.id !== 'stations-table') {
+                colCount = cols.length - 1;
+            }
+           
+            for (let j = 0; j < colCount; j++) {
+                let cellText = cols[j].innerText.replace(/"/g, '""');
+                if (cols[j].querySelector('.badge')) {
+                    cellText = cols[j].querySelector('.badge').innerText;
+                }
+                row.push('"' + cellText + '"');
             }
            
             csv.push(row.join(','));
         }
        
-        const csvFile = new Blob([csv.join('\n')], {type: 'text/csv'});
+        const csvFile = new Blob(["\uFEFF" + csv.join('\n')], {type: 'text/csv;charset=utf-8;'});
         const downloadLink = document.createElement('a');
         downloadLink.href = URL.createObjectURL(csvFile);
         downloadLink.download = filename;
@@ -702,3 +775,7 @@
     }
 </script>
 {% endblock %}
+
+
+
+

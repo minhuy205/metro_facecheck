@@ -137,6 +137,17 @@
         isChecking = true;
 
 
+        // ✨ SỬA LOGIC: Kiểm tra nếu user bỏ chọn ga giữa chừng
+        const currentStation = stationInput.value;
+        if (!currentStation) {
+            setStatus('status-error', 'ĐÃ DỪNG', 'Vui lòng chọn một ga để tiếp tục quét.');
+            isChecking = false;
+            // Đặt lại vòng lặp (nó sẽ dừng lại vì !currentStation)
+            setTimeout(performCheck, CHECKIN_INTERVAL);
+            return;
+        }
+
+
         setStatus('status-checking', 'ĐANG NHẬN DIỆN', 'Vui lòng giữ yên...');
         video.classList.add('flash');
 
@@ -161,7 +172,8 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     image_b64: data,
-                    station: stationInput.value
+                    // Luôn lấy giá trị MỚI NHẤT từ dropdown
+                    station: currentStation
                 })
             });
 
@@ -173,10 +185,11 @@
             const j = await res.json();
 
 
+            // Sửa logic: Hiển thị message từ server (đã có tiếng Việt)
             if (j.success) {
-                setStatus('status-pass', 'THÀNH CÔNG', `User ${j.user_id} | Vé: ${j.reason || 'Hợp lệ'}`);
+                setStatus('status-pass', 'THÀNH CÔNG', j.message || `User ${j.user_id} | Vé: ${j.reason || 'Hợp lệ'}`);
             } else {
-                setStatus('status-deny', 'TỪ CHỐI', `Lý do: ${j.reason || 'Không nhận diện được'}`);
+                setStatus('status-deny', 'TỪ CHỐI', j.message || `Lý do: ${j.reason || 'Không nhận diện được'}`);
             }
 
 
@@ -193,9 +206,10 @@
     };
 
 
+    // ✨ SỬA LOGIC: Xóa 'stationInput.disabled = true'
     startBtn.addEventListener('click', async () => {
         startBtn.disabled = true;
-        stationInput.disabled = true;
+        // stationInput.disabled = true; // <-- ĐÃ XÓA DÒNG NÀY
         startBtn.innerHTML = '<div class="icon-spinner"></div> Đang khởi động...';
 
 
@@ -216,7 +230,7 @@
             console.error('Lỗi Camera:', err);
             setStatus('status-error', 'LỖI CAMERA', 'Không thể mở camera. Vui lòng cấp quyền.');
             startBtn.disabled = false;
-            stationInput.disabled = false;
+            // stationInput.disabled = false; // <-- ĐÃ XÓA DÒNG NÀY
             startBtn.innerText = 'Thử lại';
         }
     });
@@ -228,4 +242,3 @@
 
 
 
-<!-- Compare this snippet from templates/buy_ticket.html: -->
