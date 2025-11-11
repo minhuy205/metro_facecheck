@@ -1,21 +1,14 @@
-{% extends "base.html" %}
-
-
-{% block title %}Kiểm Soát Vào - Metro FaceCheck{% endblock %}
-
-
-{% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/checkin.css') }}">
-{% endblock %}
-
-
-
-
-{% block content %}
-
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiểm Soát Vào - Metro FaceCheck</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/checkin.css') }}">
+</head>
+<body>
 
 <div class="checkin-page-wrapper">
-
 
     <svg style="display:none;" xmlns="http://www.w3.org/2000/svg">
         <symbol id="icon-idle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -37,7 +30,6 @@
         </symbol>
     </svg>
 
-
     <div class="checkin-container">
         <div class="camera-box">
             <video id="video" autoplay muted playsinline></video>
@@ -46,11 +38,9 @@
             </div>
         </div>
 
-
         <div class="info-box">
             <h2>🚇 Check-In Metro</h2>
             <p>Chọn ga và đưa khuôn mặt vào camera để xác thực.</p>
-
 
             <div id="status" class="status-box status-idle">
                 <div class="status-icon">
@@ -61,7 +51,6 @@
                     <p id="status-subtitle">Vui lòng chọn ga của bạn để bắt đầu.</p>
                 </div>
             </div>
-
 
             <label for="station">Chọn Ga</label>
             <select id="station" class="station-select">
@@ -75,16 +64,9 @@
         </div>
     </div>
 
-
 </div>
-{% endblock %}
 
-
-
-
-{% block extra_js %}
 <script>
-    // Lấy các element
     const video = document.getElementById('video');
     const startBtn = document.getElementById('start');
     const stationInput = document.getElementById('station');
@@ -97,7 +79,6 @@
     const CHECKIN_INTERVAL = 3000;
     let isChecking = false;
 
-
     stationInput.addEventListener('change', () => {
         if (stationInput.value) {
             startBtn.disabled = false;
@@ -107,7 +88,6 @@
             setStatus('status-idle', 'Chưa Sẵn Sàng', 'Vui lòng chọn ga của bạn để bắt đầu.');
         }
     });
-
 
     const setStatus = (state, title, subtitle) => {
         statusBox.className = 'status-box ' + state;
@@ -125,32 +105,26 @@
         } else if (state === 'status-error') {
             statusIcon.innerHTML = '<svg><use href="#icon-error"></use></svg>';
             cameraOverlay.classList.remove('visible');
-        } else { // idle
+        } else {
             statusIcon.innerHTML = '<svg><use href="#icon-idle"></use></svg>';
             cameraOverlay.classList.remove('visible');
         }
     };
 
-
     const performCheck = async () => {
         if (isChecking) return;
         isChecking = true;
 
-
-        // ✨ SỬA LOGIC: Kiểm tra nếu user bỏ chọn ga giữa chừng
         const currentStation = stationInput.value;
         if (!currentStation) {
             setStatus('status-error', 'ĐÃ DỪNG', 'Vui lòng chọn một ga để tiếp tục quét.');
             isChecking = false;
-            // Đặt lại vòng lặp (nó sẽ dừng lại vì !currentStation)
             setTimeout(performCheck, CHECKIN_INTERVAL);
             return;
         }
 
-
         setStatus('status-checking', 'ĐANG NHẬN DIỆN', 'Vui lòng giữ yên...');
         video.classList.add('flash');
-
 
         const canvas = document.createElement('canvas');
         canvas.width = video.videoWidth || 640;
@@ -162,9 +136,7 @@
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         const data = canvas.toDataURL('image/jpeg');
 
-
         setTimeout(() => video.classList.remove('flash'), 300);
-
 
         try {
             const res = await fetch('http://127.0.0.1:5000/api/checkin', {
@@ -172,32 +144,23 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     image_b64: data,
-                    // Luôn lấy giá trị MỚI NHẤT từ dropdown
                     station: currentStation
                 })
             });
 
-
-            if (!res.ok) {
-                throw new Error(`HTTP error! status: ${res.status}`);
-            }
-           
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
             const j = await res.json();
 
-
-            // Sửa logic: Hiển thị message từ server (đã có tiếng Việt)
             if (j.success) {
                 setStatus('status-pass', 'THÀNH CÔNG', j.message || `User ${j.user_id} | Vé: ${j.reason || 'Hợp lệ'}`);
             } else {
                 setStatus('status-deny', 'TỪ CHỐI', j.message || `Lý do: ${j.reason || 'Không nhận diện được'}`);
             }
 
-
         } catch (e) {
             console.error('Lỗi Check-in:', e);
             setStatus('status-error', 'LỖI', 'Không thể kết nối máy chủ. Đang thử lại...');
         }
-
 
         setTimeout(() => {
             isChecking = false;
@@ -205,19 +168,14 @@
         }, CHECKIN_INTERVAL);
     };
 
-
-    // ✨ SỬA LOGIC: Xóa 'stationInput.disabled = true'
     startBtn.addEventListener('click', async () => {
         startBtn.disabled = true;
-        // stationInput.disabled = true; // <-- ĐÃ XÓA DÒNG NÀY
         startBtn.innerHTML = '<div class="icon-spinner"></div> Đang khởi động...';
-
 
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true });
             video.srcObject = stream;
             video.play();
-
 
             video.oncanplay = () => {
                 startBtn.innerHTML = 'ĐANG CHẠY...';
@@ -225,20 +183,14 @@
                 performCheck();
             };
 
-
         } catch (err) {
             console.error('Lỗi Camera:', err);
             setStatus('status-error', 'LỖI CAMERA', 'Không thể mở camera. Vui lòng cấp quyền.');
             startBtn.disabled = false;
-            // stationInput.disabled = false; // <-- ĐÃ XÓA DÒNG NÀY
             startBtn.innerText = 'Thử lại';
         }
     });
-
-
 </script>
-{% endblock %}
 
-
-
-
+</body>
+</html>

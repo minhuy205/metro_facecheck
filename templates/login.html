@@ -1,67 +1,59 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng Nhập - Metro FaceCheck</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-overlay"></div>
+    <div class="auth-card">
+      <div class="auth-header">
+        <h2>Đăng Nhập</h2>
+        <p>Vào hệ thống Metro FaceCheck</p>
+      </div>
 
+      {% if error %}
+        <div class="alert alert-error">{{ error }}</div>
+      {% endif %}
 
-{% block title %}Đăng Nhập - Metro FaceCheck{% endblock %}
-
-
-{% block content %}
-<div class="page-container">
-    <div class="auth-container">
-        <div class="auth-card">
-            <div class="auth-header">
-                <h2>Đăng Nhập</h2>
-                <p>Vào hệ thống Metro FaceCheck</p>
-            </div>
-
-
-            {% if error %}
-                <div class="alert alert-error" style="margin-bottom: 1.5rem;">
-                    {{ error }}
-                </div>
-            {% endif %}
-
-
-            <form method="POST" class="auth-form">
-                <div class="form-group">
-                    <label for="username">Tên Đăng Nhập</label>
-                    <input
-                        type="text"
-                        id="username"
-                        name="username"
-                        placeholder="Nhập tên đăng nhập"
-                        required
-                    >
-                </div>
-
-
-                <div class="form-group">
-                    <label for="password">Mật Khẩu</label>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        placeholder="Nhập mật khẩu"
-                        required
-                    >
-                </div>
-
-
-                <button type="submit" class="btn btn-primary btn-lg btn-block">
-                    Đăng Nhập
-                </button>
-            </form>
-
-
-            <div class="auth-footer">
-                <p>Chưa có tài khoản? <a href="/register">Đăng ký ngay</a></p>
-            </div>
+      <form method="POST" class="auth-form">
+        <div class="form-group">
+          <label for="username">Tên Đăng Nhập</label>
+          <input type="text" id="username" name="username" placeholder="Nhập tên đăng nhập" required>
         </div>
+
+        <div class="form-group">
+          <label for="password">Mật Khẩu</label>
+          <input type="password" id="password" name="password" placeholder="Nhập mật khẩu" required>
+        </div>
+
+        <div class="form-options">
+          <label><input type="checkbox" name="remember"> Ghi nhớ đăng nhập</label>
+          <a href="#">Quên mật khẩu?</a>
+        </div>
+
+        <button type="submit" class="btn-login">Đăng Nhập</button>
+      </form>
+
+      <div class="divider">hoặc</div>
+
+      <div class="social-login">
+        <button class="facebook-btn">Facebook</button>
+        <button class="twitter-btn">Twitter</button>
+      </div>
+
+      <div class="auth-footer">
+        <p>Chưa có tài khoản? <a href="/register">Đăng ký ngay</a></p>
+      </div>
+
+      <!-- 🔹 Nút quay lại -->
+      <div class="back-home">
+        <a href="/" class="back-button">← Quay về trang chủ</a>
+      </div>
     </div>
-</div>
-{% endblock %}
-
-
-
-
-
-
+  </div>
+</body>
+</html>
