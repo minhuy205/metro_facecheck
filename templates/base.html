@@ -19,7 +19,7 @@
             <div class="navbar-menu">
                 {% if session.get('user') %}
                     <div class="user-menu">
-                        <span class="user-greeting">Xin chào, {{ session['user']['username'] }}</span>
+                        <!-- <span class="user-greeting">Xin chào, {{ session['user']['username'] }}</span> -->
                         {% if session['user']['role'] == 'admin' %}
                             <a href="/admin" class="nav-link admin-link">Admin</a>
                         {% else %}

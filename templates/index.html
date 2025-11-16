@@ -155,35 +155,28 @@
 
 
         <!-- User Info -->
-        <section class="info-section" style="margin-top: 2rem;">
-            <div style="background: var(--white); border: 1px solid var(--gray-light); border-radius: 0.75rem; padding: 1.5rem;">
-                <h3 style="margin-bottom: 1rem;">Thông Tin Tài Khoản</h3>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-                    <div>
-                        <p style="color: #666; font-size: 0.9rem;">Tên đăng nhập</p>
-                        <p style="font-weight: 600;">{{ session['user']['username'] }}</p>
-                    </div>
-                    <div>
-                        <p style="color: #666; font-size: 0.9rem;">Email</p>
-                        <p style="font-weight: 600;">{{ session['user']['email'] }}</p>
-                    </div>
-                    <div>
-                        <p style="color: #666; font-size: 0.9rem;">Số điện thoại</p>
-                        <p style="font-weight: 600;">{{ session['user']['phone'] }}</p>
-                    </div>
-                    <div>
-                        <p style="color: #666; font-size: 0.9rem;">Vai trò</p>
-                        <p style="font-weight: 600;">
-                            {% if session['user']['role'] == 'admin' %}
-                                <span class="badge badge-primary">Quản Trị Viên</span>
-                            {% else %}
-                                <span class="badge badge-secondary">Người Dùng</span>
-                            {% endif %}
-                        </p>
-                    </div>
+        <!-- User Info Card -->
+        <div class="user-details-card">
+            <h3>📋 Thông Tin Tài Khoản</h3>
+            <div class="user-details-grid">
+                <div class="detail-item">
+                    <span class="detail-label">👤 Tên đăng nhập</span>
+                    <span class="detail-value">{{ session['user']['username'] }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">📧 Email</span>
+                    <span class="detail-value">{{ session['user']['email'] }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">📞 Số điện thoại</span>
+                    <span class="detail-value">{{ session['user']['phone'] }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">🟢 Trạng thái</span>
+                    <span class="detail-value status-active">Đang hoạt động</span>
                 </div>
             </div>
-        </section>
+        </div>
     {% endif %}
 </div>
 {% endblock %}

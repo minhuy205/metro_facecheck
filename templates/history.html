@@ -70,6 +70,7 @@
                             <!-- ✨ SỬA LỖI: Dùng ticket.purchase_time (từ CSDL) -->
                             <td>{{ ticket.purchase_time.strftime('%d/%m/%Y %H:%M') if ticket.purchase_time else '-' }}</td>
                         </tr>
+                        
                     {% endfor %}
                 </tbody>
             </table>
@@ -82,6 +83,9 @@
             <a href="/buy_ticket" class="btn btn-primary btn-lg">Mua Vé Ngay</a>
         </div>
     {% endif %}
+    <div class="back-home">
+        <a href="/" class="back-button">← Quay về trang chủ</a>
+    </div>
 </div>
 {% endblock %}
 
