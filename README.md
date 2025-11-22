@@ -13,3 +13,11 @@ Run:
 1. Create virtualenv and install requirements: `pip install -r requirements.txt`
 2. Run `python app.py`
 3. Open http://127.0.0.1:5000/
+ 
+ How to run source?
+ =>
+ "cd metro_facecheck
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python app.py"
